@@ -1,5 +1,7 @@
 package lexer
 
+import "monkey/token"
+
 type Lexer struct {
 	input        string
 	position     int  // current position in input
@@ -9,19 +11,58 @@ type Lexer struct {
 
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
+	l.readChar()
 	return l
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-// readChar reads the next character from the input and updates the position and
-// readPosition pointers.
-/*******  3420a72d-c324-47c2-a816-60863b9c1737  *******/
+/*
+The purpose of readChar is to give us the next character
+and advance our position in the input string.
+l.position will always point to the character we last read
+and readPosition will always point to the next character we're going to read
+*/
 func (l *Lexer) readChar() {
+	// check if end of input
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
 	} else {
+		// if not sets the current byte to the index of the read position
 		l.ch = l.input[l.readPosition]
 	}
+	// sets position to readPosition
 	l.position = l.readPosition
+	// iterates read position
 	l.readPosition += 1
+}
+
+func (l *Lexer) NextToken() token.Token {
+	var tok token.Token
+
+	switch l.ch {
+	case '=':
+		tok = newToken(token.ASSIGN, l.ch)
+	case ';':
+		tok = newToken(token.SEMICOLON, l.ch)
+	case '(':
+		tok = newToken(token.LPAREN, l.ch)
+	case ')':
+		tok = newToken(token.RPAREN, l.ch)
+	case ',':
+		tok = newToken(token.COMMA, l.ch)
+	case '+':
+		tok = newToken(token.PLUS, l.ch)
+	case '{':
+		tok = newToken(token.LBRACE, l.ch)
+	case '}':
+		tok = newToken(token.RBRACE, l.ch)
+	case 0:
+		tok.Literal = ""
+		tok.Type = token.EOF
+	}
+	l.readChar()
+	return tok
+}
+
+func newToken(tokenType token.TokenType, ch byte) token.Token {
+	return token.Token{Type: tokenType, Literal: string(ch)}
 }
