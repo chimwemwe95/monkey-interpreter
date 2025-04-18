@@ -58,8 +58,11 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	// default branch if we get valid characters that aren't our key
+	// syntax characters
 	default:
 		if isLetter(l.ch) {
+			// we set the tok.Literal by calling readIdent
 			tok.Literal = l.readIdentifier()
 			return tok
 		} else {
@@ -70,6 +73,7 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
+// reads the identifier and advances completion until a non letter is read
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 	for isLetter(l.ch) {
@@ -78,6 +82,7 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[position:l.position]
 }
 
+// this just makes sure we've got a letter
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
